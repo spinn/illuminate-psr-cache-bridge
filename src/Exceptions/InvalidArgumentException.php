@@ -1,5 +1,5 @@
 <?php
-namespace Madewithlove\LaravelPsrCacheBridge\Exceptions;
+namespace Madewithlove\IlluminatePsrCacheBridge\Exceptions;
 
 use Exception;
 use Psr\Cache\InvalidArgumentException as InvalidArgumentExceptionContract;

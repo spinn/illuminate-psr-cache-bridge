@@ -1,4 +1,6 @@
 {
+    "name": "madewithlove/illuminate-psr-cache-bridge",
+    "type": "library",
     "require": {
         "php": ">=5.5.0",
         "illuminate/contracts": "^5.0",
@@ -9,7 +11,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Madewithlove\\LaravelPsrCacheBridge\\": "src/"
+            "Madewithlove\\IlluminatePsrCacheBridge\\": "src/"
         }
     }
 }
