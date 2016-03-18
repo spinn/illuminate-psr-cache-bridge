@@ -7,11 +7,18 @@
         "psr/cache": "^1.0"
     },
     "require-dev": {
-        "illuminate/cache": "^5.0"
+        "illuminate/cache": "^5.0",
+        "phpunit/phpunit": "^4.8"
     },
     "autoload": {
         "psr-4": {
             "Madewithlove\\IlluminatePsrCacheBridge\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Madewithlove\\IlluminatePsrCacheBridge\\Tests\\Integration\\": "tests/integration/",
+            "Madewithlove\\IlluminatePsrCacheBridge\\Tests\\Unit\\": "tests/unit/"
         }
     }
 }
