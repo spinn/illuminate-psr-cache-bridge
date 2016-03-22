@@ -54,9 +54,9 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function getItems(array $keys = array())
     {
-        foreach ($keys as $key) {
-            yield $key => $this->getItem($key);
-        }
+        return array_map(function ($key) {
+            return $this->getItem($key);
+        }, $keys);
     }
 
     /**
