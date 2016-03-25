@@ -19,5 +19,15 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
 
         // Assert
         $this->assertInstanceOf(CacheItemPoolInterface::class, $pool);
+        $this->assertInstanceOf(CacheItemPool::class, $pool);
+    }
+
+    public function it_can_say_if_is_cache_hit()
+    {
+        // Arrange
+        
+        
+        // Act
+        // Assert
     }
 }
