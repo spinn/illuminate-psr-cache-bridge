@@ -22,12 +22,19 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(CacheItemPool::class, $pool);
     }
 
-    public function it_can_say_if_is_cache_hit()
+    /** @test */
+    public function it_can_retrieve_items()
     {
         // Arrange
-        
-        
+        $repository = $this->getMockBuilder(Repository::class)->getMock();
+        $repository->method('has')->with('key')->willReturn(false);
+
+        $pool = new CacheItemPool($repository);
+
         // Act
+        $item = $pool->getItem('key');
+
         // Assert
+        $this->assertFalse($item->isHit());
     }
 }
