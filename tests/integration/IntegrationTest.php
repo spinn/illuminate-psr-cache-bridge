@@ -1,15 +1,17 @@
 <?php
 namespace Madewithlove\IlluminatePsrCacheBridge\Tests\Integration;
 
+use DateInterval;
+use DateTime;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\MemcachedStore;
 use Illuminate\Cache\Repository;
+use Madewithlove\IlluminatePsrCacheBridge\Exceptions\InvalidArgumentException;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItem;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
 use Memcached;
 use PHPUnit_Framework_TestCase;
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
 
 class IntegrationTest extends PHPUnit_Framework_TestCase
 {
@@ -86,6 +88,46 @@ class IntegrationTest extends PHPUnit_Framework_TestCase
         // Act
         $foo = $this->pool->getItem('foo');
         $this->pool->save($foo->set('bar')->expiresAfter(1));
+        sleep(2); // The item MUST be expired after 2 seconds.
+
+        // Assert
+        $foo = $this->pool->getItem('foo');
+        $this->assertFalse($foo->isHit());
+        $this->assertFalse($this->pool->hasItem('foo'));
+    }
+
+    /** @test */
+    public function it_can_save_for_time_indicated_by_interval()
+    {
+        // Arrange
+        $memcache = new Memcached();
+        $memcache->flush();
+        $this->repository = new Repository(new MemcachedStore($memcache));
+        $this->pool = new CacheItemPool($this->repository);
+
+        // Act
+        $foo = $this->pool->getItem('foo');
+        $this->pool->save($foo->set('bar')->expiresAfter(new DateInterval('PT1S')));
+        sleep(2); // The item MUST be expired after 2 seconds.
+
+        // Assert
+        $foo = $this->pool->getItem('foo');
+        $this->assertFalse($foo->isHit());
+        $this->assertFalse($this->pool->hasItem('foo'));
+    }
+
+    /** @test */
+    public function it_can_save_for_time_indicated_by_datetime()
+    {
+        // Arrange
+        $memcache = new Memcached();
+        $memcache->flush();
+        $this->repository = new Repository(new MemcachedStore($memcache));
+        $this->pool = new CacheItemPool($this->repository);
+
+        // Act
+        $foo = $this->pool->getItem('foo');
+        $this->pool->save($foo->set('bar')->expiresAt(new DateTime('+ 1 seconds')));
         sleep(2); // The item MUST be expired after 2 seconds.
 
         // Assert
@@ -231,5 +273,60 @@ class IntegrationTest extends PHPUnit_Framework_TestCase
         // Assert
         $this->assertTrue($result1);
         $this->assertTrue($result2);
+    }
+
+    /** @test */
+    public function it_correctly_clear_entire_store()
+    {
+        // Arrange
+        $this->repository->add('foo', 'bar', 100);
+
+        // Act
+        $this->pool->clear();
+
+        // Assert
+        $this->assertFalse($this->repository->has('foo'));
+        $this->assertFalse($this->pool->getItem('foo')->isHit());
+    }
+
+    /** @test */
+    public function it_throws_exception_when_invalid_key_is_used()
+    {
+        // Arrange
+        $exceptionsCatched = 0;
+
+        // Act
+        try {
+            $this->pool->getItem('foo{}bar');
+        } catch (InvalidArgumentException $exception) {
+            $exceptionsCatched++;
+        }
+
+        try {
+            $this->pool->getItems(['foo()bar']);
+        } catch (InvalidArgumentException $exception) {
+            $exceptionsCatched++;
+        }
+
+        try {
+            $this->pool->hasItem(['foo/\\bar']);
+        } catch (InvalidArgumentException $exception) {
+            $exceptionsCatched++;
+        }
+
+        try {
+            $this->pool->deleteItem('foo{}bar');
+        } catch (InvalidArgumentException $exception) {
+            $exceptionsCatched++;
+        }
+
+        try {
+            $this->pool->deleteItems(['foo@:bar']);
+        } catch (InvalidArgumentException $exception) {
+            $exceptionsCatched++;
+        }
+
+        // Assert
+        $this->assertEquals(5, $exceptionsCatched);
     }
 }
