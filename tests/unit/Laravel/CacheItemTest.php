@@ -137,4 +137,17 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         // Assert
         $this->assertEquals(0, $item->getTTL());
     }
+
+    /** @test */
+    public function it_will_remember_value_that_has_been_set()
+    {
+        // Arrange
+        $item = new CacheItem('foo');
+
+        // Act
+        $item->set('bar');
+
+        // Assert
+        $this->assertEquals('bar', $item->get());
+    }
 }
