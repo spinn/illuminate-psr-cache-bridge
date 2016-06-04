@@ -75,7 +75,9 @@ class CacheItemPool implements CacheItemPoolInterface
     public function clear()
     {
         try {
-            $this->repository->flush();
+            /* @var \Illuminate\Contracts\Cache\Store $store */
+            $store = $this->repository;
+            $store->flush();
         } catch (Exception $exception) {
             return false;
         }
