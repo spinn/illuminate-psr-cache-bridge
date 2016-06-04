@@ -2,6 +2,7 @@
     "name": "madewithlove/illuminate-psr-cache-bridge",
     "type": "library",
     "license": "MIT",
+    "keywords": ["Laravel", "cache", "PSR-6", "adapter", "bridge", "implementation"],
     "require": {
         "php": ">=5.5.0",
         "illuminate/contracts": "^5.0",
@@ -11,6 +12,9 @@
         "illuminate/cache": "^5.0",
         "phpunit/phpunit": "^4.8",
         "nesbot/carbon": "^1.3.0"
+    },
+    "provide": {
+        "psr/cache-implementation": "1.0.0"
     },
     "autoload": {
         "psr-4": {
