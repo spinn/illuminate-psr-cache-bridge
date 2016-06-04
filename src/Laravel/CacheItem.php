@@ -2,7 +2,7 @@
 namespace Madewithlove\IlluminatePsrCacheBridge\Laravel;
 
 use DateInterval;
-use DateTime;
+use DateTimeInterface;
 use Psr\Cache\CacheItemInterface;
 
 class CacheItem implements CacheItemInterface
@@ -23,7 +23,7 @@ class CacheItem implements CacheItemInterface
     private $hit;
 
     /**
-     * @var \DateTime|\DateInterval|int
+     * @var \DateTimeInterface|\DateInterval|int
      */
     private $expires;
 
@@ -103,7 +103,7 @@ class CacheItem implements CacheItemInterface
             return floor($this->expires / 60.0);
         }
 
-        if ($this->expires instanceof DateTime) {
+        if ($this->expires instanceof DateTimeInterface) {
             $diff = (new DateTime())->diff($this->expires);
 
             return boolval($diff->invert) ? 0 : $diff->i;
