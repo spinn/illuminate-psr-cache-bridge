@@ -1,6 +1,7 @@
 {
     "name": "madewithlove/illuminate-psr-cache-bridge",
     "type": "library",
+    "license": "MIT",
     "require": {
         "php": ">=5.5.0",
         "illuminate/contracts": "^5.0",
