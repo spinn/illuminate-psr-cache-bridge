@@ -1,9 +1,9 @@
 <?php
 namespace Madewithlove\IlluminatePsrCacheBridge\Exceptions;
 
-use Exception;
+use InvalidArgumentException as BaseInvalidArgumentException;
 use Psr\Cache\InvalidArgumentException as InvalidArgumentExceptionContract;
 
-class InvalidArgumentException extends Exception implements InvalidArgumentExceptionContract
+class InvalidArgumentException extends BaseInvalidArgumentException implements InvalidArgumentExceptionContract
 {
 }
