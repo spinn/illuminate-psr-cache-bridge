@@ -123,10 +123,14 @@ class CacheItemPool implements CacheItemPoolInterface
             $expiresInMinutes = $item->getTTL();
         }
 
-        if (is_null($expiresInMinutes)) {
-            $this->repository->forever($item->getKey(), serialize($item->get()));
-        } else {
-            $this->repository->put($item->getKey(), serialize($item->get()), $expiresInMinutes);
+        try {
+            if (is_null($expiresInMinutes)) {
+                $this->repository->forever($item->getKey(), serialize($item->get()));
+            } else {
+                $this->repository->put($item->getKey(), serialize($item->get()), $expiresInMinutes);
+            }
+        } catch (Exception $exception) {
+            return false;
         }
 
         return true;
@@ -138,6 +142,8 @@ class CacheItemPool implements CacheItemPoolInterface
     public function saveDeferred(CacheItemInterface $item)
     {
         $this->deferred[] = $item;
+
+        return true;
     }
 
     /**
