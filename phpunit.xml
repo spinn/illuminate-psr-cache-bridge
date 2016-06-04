@@ -10,10 +10,10 @@
          processIsolation="false"
          stopOnFailure="false">
   <testsuites>
-    <testsuite name="madewithlove/illuminate-psr-cache-bridge integration test suite">
+    <testsuite name="integration-tests">
       <directory>tests/integration</directory>
     </testsuite>
-    <testsuite name="madewithlove/illuminate-psr-cache-bridge unit test suite">
+    <testsuite name="unit-tests">
       <directory>tests/unit</directory>
     </testsuite>
   </testsuites>
