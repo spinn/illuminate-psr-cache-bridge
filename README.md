@@ -1,4 +1,4 @@
-# Export interface with a CSV implementation
+# PSR-6 cache implementation that connects to Laravel's cache Repository
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/madewithlove/illuminate-psr-cache-bridge.svg?style=flat-square)](https://packagist.org/packages/madewithlove/illuminate-psr-cache-bridge)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
