@@ -182,7 +182,7 @@ class IntegrationTest extends PHPUnit_Framework_TestCase
         }, $items);
 
         // Assert
-        $this->assertEquals([false, false, false], $hits);
+        $this->assertEquals(['foo' => false, 'bar' => false, 'baz' => false], $hits);
     }
 
     /** @test */
