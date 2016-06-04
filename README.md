@@ -10,7 +10,7 @@
 
 To start using a `Psr\Cache\CacheItemPoolInterface` typed implementation that stores data in Laravel's configured cache, add this to a service provider:
 
-```
+```php
 use Illuminate\Contracts\Cache\Repository;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
 use Psr\Cache\CacheItemPoolInterface;
