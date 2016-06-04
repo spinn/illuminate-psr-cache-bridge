@@ -2,6 +2,7 @@
 namespace Madewithlove\IlluminatePsrCacheBridge\Laravel;
 
 use DateInterval;
+use DateTime;
 use DateTimeInterface;
 use Psr\Cache\CacheItemInterface;
 
