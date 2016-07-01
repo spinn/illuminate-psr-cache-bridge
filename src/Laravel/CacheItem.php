@@ -1,9 +1,7 @@
 <?php
 namespace Madewithlove\IlluminatePsrCacheBridge\Laravel;
 
-use Carbon\Carbon;
 use DateInterval;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Cache\CacheItemInterface;
