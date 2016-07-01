@@ -1,5 +1,8 @@
 language: php
 
+services:
+  - memcached
+
 matrix:
   include:
     - php: 5.6
