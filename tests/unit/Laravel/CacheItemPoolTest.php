@@ -146,6 +146,7 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
     {
         // Arrange
         $repository = $this->getMockBuilder(Repository::class)->getMock();
+        $repository->method('has')->with('bar')->willReturn(true);
         $repository->method('forget')->with('bar')->willReturn(false);
         $pool = new CacheItemPool($repository);
 
@@ -154,6 +155,21 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
 
         // Assert
         $this->assertFalse($result);
+    }
+
+    /** @test */
+    public function it_returns_true_when_repository_doesnt_have_it()
+    {
+        // Arrange
+        $repository = $this->getMockBuilder(Repository::class)->getMock();
+        $repository->method('has')->with('bar')->willReturn(false);
+        $pool = new CacheItemPool($repository);
+
+        // Act
+        $result = $pool->deleteItem('bar');
+
+        // Assert
+        $this->assertTrue($result);
     }
 
     /** @test */
@@ -208,6 +224,9 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
     {
         // Arrange
         $repository = $this->getMockBuilder(Repository::class)->getMock();
+        $repository->method('has')
+            ->withConsecutive(['bar'], ['foo'], ['baz'])
+            ->willReturnOnConsecutiveCalls(true, true, true);
         $repository->method('forget')
             ->withConsecutive(['bar'], ['foo'], ['baz'])
             ->willReturnOnConsecutiveCalls(true, false, true);
@@ -315,7 +334,7 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
     {
         // Arrange
         $seconds = 65;
-        $minutes = (int) round($seconds / 60);
+        $minutes = 1;
         $repository = $this->getMockBuilder(Repository::class)->getMock();
         $repository->method('put')->with('bar', serialize('baz'), $minutes)->willReturn(true);
         $pool = new CacheItemPool($repository);

@@ -1,8 +1,10 @@
 <?php
 namespace Madewithlove\IlluminatePsrCacheBridge\Laravel;
 
+use Carbon\Carbon;
 use DateInterval;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Cache\CacheItemInterface;
 
@@ -24,7 +26,7 @@ class CacheItem implements CacheItemInterface
     private $hit;
 
     /**
-     * @var \DateTimeInterface|\DateInterval|int
+     * @var \DateTimeInterface
      */
     private $expires;
 
@@ -36,8 +38,8 @@ class CacheItem implements CacheItemInterface
     public function __construct($key, $value = null, $hit = false)
     {
         $this->key = $key;
-        $this->value = $value;
         $this->hit = boolval($hit);
+        $this->value = $this->hit ? $value : null;
     }
 
     /**
@@ -77,9 +79,13 @@ class CacheItem implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function expiresAt($expiration)
+    public function expiresAt($expires)
     {
-        $this->expires = $expiration;
+        if ($expires instanceof DateTimeInterface && ! $expires instanceof DateTimeImmutable) {
+            $expires = DateTimeImmutable::createFromMutable($expires);
+        }
+
+        $this->expires = $expires;
 
         return $this;
     }
@@ -89,29 +95,22 @@ class CacheItem implements CacheItemInterface
      */
     public function expiresAfter($time)
     {
-        $this->expires = $time;
+        $this->expires = new DateTimeImmutable();
+
+        if (! $time instanceof DateInterval) {
+            $time = new DateInterval(sprintf('PT%sS', $time));
+        }
+
+        $this->expires = $this->expires->add($time);
 
         return $this;
     }
 
     /**
-     * @return int|null
-     *   The amount of minutes this item should stay alive. Or null when no expires is given.
+     * @return \DateTimeInterface
      */
-    public function getTTL()
+    public function getExpiresAt()
     {
-        if (is_int($this->expires)) {
-            return floor($this->expires / 60.0);
-        }
-
-        if ($this->expires instanceof DateTimeInterface) {
-            $diff = (new DateTime())->diff($this->expires);
-
-            return boolval($diff->invert) ? 0 : $diff->i;
-        }
-
-        if ($this->expires instanceof DateInterval) {
-            return boolval($this->expires->invert) ? 0 : $this->expires->i;
-        }
+        return $this->expires;
     }
 }

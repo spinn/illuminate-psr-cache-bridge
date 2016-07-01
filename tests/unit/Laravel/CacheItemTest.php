@@ -50,36 +50,29 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function it_can_set_ttl_in_seconds_and_return_minutes()
+    public function it_can_set_ttl_in_seconds()
     {
         // Arrange
-        $expiringInExactlyOneMinute = new CacheItem('key1', 'value');
-        $expiringInOneMinute = new CacheItem('key2', 'value');
-        $expiringNow = new CacheItem('key3', 'value');
+        $expiringInExactlyOneMinute = (new CacheItem('key1', 'value'))->expiresAfter(60);
 
         // Act
-        $expiringInExactlyOneMinute->expiresAfter(60);
-        $expiringInOneMinute->expiresAfter(61);
-        $expiringNow->expiresAfter(59);
 
         // Assert
-        $this->assertEquals(1, $expiringInExactlyOneMinute->getTTL());
-        $this->assertEquals(1, $expiringInOneMinute->getTTL());
-        $this->assertEquals(0, $expiringNow->getTTL());
+        $this->assertEquals(new \DateTimeImmutable('+ 1 minute'), $expiringInExactlyOneMinute->getExpiresAt());
     }
 
     /** @test */
-    public function it_will_return_null_when_not_expiring()
+    public function it_can_set_ttl_with_date_interval()
     {
         // Arrange
-        $nonExpiringItem = new CacheItem('key', 'value');
+        $expiringInExactlyOneMinute = (new CacheItem('key1', 'value'))->expiresAfter(new \DateInterval('PT1M'));
 
         // Act
 
         // Assert
-        $this->assertNull($nonExpiringItem->getTTL());
+        $this->assertEquals(new \DateTimeImmutable('+ 1 minute'), $expiringInExactlyOneMinute->getExpiresAt());
     }
-    
+
     /** @test */
     public function it_can_set_expiry_with_datetime()
     {
@@ -91,51 +84,19 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         $item->expiresAt($now->addMinute());
 
         // Assert
-        $this->assertEquals(1, $item->getTTL());
+        $this->assertEquals($now, $item->getExpiresAt());
     }
 
     /** @test */
-    public function it_will_set_ttl_to_zero_if_datetime_in_the_past()
+    public function it_will_return_null_when_not_expiring()
     {
         // Arrange
-        $item = new CacheItem('key', 'value');
+        $nonExpiringItem = new CacheItem('key', 'value');
 
         // Act
-        Carbon::setTestNow($now = Carbon::now());
-        $item->expiresAt($now->subMinute());
 
         // Assert
-        $this->assertEquals(0, $item->getTTL());
-    }
-
-    /** @test */
-    public function it_will_set_ttl_correctly_when_given_datetime_interval()
-    {
-        // Arrange
-        $item = new CacheItem('key', 'value');
-
-        // Act
-        Carbon::setTestNow($now = Carbon::now());
-        $plusTwoMinutes = $now->copy()->addMinutes(2);
-        $item->expiresAt($now->diff($plusTwoMinutes));
-
-        // Assert
-        $this->assertEquals(2, $item->getTTL());
-    }
-
-    /** @test */
-    public function it_will_set_ttl_to_zero_when_datetime_interval_is_inverted()
-    {
-        // Arrange
-        $item = new CacheItem('key', 'value');
-
-        // Act
-        Carbon::setTestNow($now = Carbon::now());
-        $plusTwoMinutes = $now->copy()->addMinutes(2);
-        $item->expiresAt($plusTwoMinutes->diff($now));
-
-        // Assert
-        $this->assertEquals(0, $item->getTTL());
+        $this->assertNull($nonExpiringItem->getExpiresAt());
     }
 
     /** @test */
@@ -149,5 +110,20 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
 
         // Assert
         $this->assertEquals('bar', $item->get());
+    }
+
+    /** @test */
+    public function it_will_not_keep_reference_to_passed_date_time_interfaced_object()
+    {
+        // Arrange
+        $item = new CacheItem('foo');
+
+        // Act
+        Carbon::setTestNow($now = Carbon::now());
+        $item->expiresAt($now);
+        $now->addMinute(1);
+
+        // Assert
+        $this->assertNotEquals($now, $item->getExpiresAt());
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Madewithlove\IlluminatePsrCacheBridge\Laravel;
 
+use DateTimeImmutable;
 use Exception;
 use Illuminate\Contracts\Cache\Repository;
 use Madewithlove\IlluminatePsrCacheBridge\Exceptions\InvalidArgumentException;
@@ -42,7 +43,9 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         $this->validateKey($key);
 
-        if ($this->repository->has($key)) {
+        if (isset($this->deferred[$key])) {
+            return clone($this->deferred[$key]);
+        } elseif ($this->repository->has($key)) {
             return new CacheItem($key, unserialize($this->repository->get($key)), true);
         } else {
             return new CacheItem($key);
@@ -66,6 +69,16 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         $this->validateKey($key);
 
+        if (isset($this->deferred[$key])) {
+            $item = $this->deferred[$key];
+
+            if (! $item->getExpiresAt()) {
+                return true;
+            }
+
+            return $item->getExpiresAt() > new DateTimeImmutable();
+        }
+
         return $this->repository->has($key);
     }
 
@@ -76,6 +89,7 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         try {
             /* @var \Illuminate\Contracts\Cache\Store $store */
+            $this->deferred = [];
             $store = $this->repository;
             $store->flush();
         } catch (Exception $exception) {
@@ -91,6 +105,12 @@ class CacheItemPool implements CacheItemPoolInterface
     public function deleteItem($key)
     {
         $this->validateKey($key);
+
+        unset($this->deferred[$key]);
+
+        if (! $this->hasItem($key)) {
+            return true;
+        }
 
         return $this->repository->forget($key);
     }
@@ -119,17 +139,24 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function save(CacheItemInterface $item)
     {
-        $expiresInMinutes = null;
-
-        if ($item instanceof CacheItem) {
-            $expiresInMinutes = $item->getTTL();
-        }
+        $expiresAt = $item->getExpiresAt();
 
         try {
-            if (is_null($expiresInMinutes)) {
+            if (! $expiresAt) {
                 $this->repository->forever($item->getKey(), serialize($item->get()));
             } else {
-                $this->repository->put($item->getKey(), serialize($item->get()), $expiresInMinutes);
+                $now = new DateTimeImmutable('now', $expiresAt->getTimezone());
+
+                $seconds = $expiresAt->getTimestamp() - $now->getTimestamp();
+                $minutes = (int) floor($seconds / 60.0);
+
+                if ($minutes <= 0) {
+                    $this->repository->forget($item->getKey());
+
+                    return false;
+                }
+
+                $this->repository->put($item->getKey(), serialize($item->get()), $minutes);
             }
         } catch (Exception $exception) {
             return false;
@@ -143,7 +170,15 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        $this->deferred[] = $item;
+        $expiresAt = $item->getExpiresAt();
+
+        if ($expiresAt && ($expiresAt < new DateTimeImmutable())) {
+            return false;
+        }
+
+        $item = (new CacheItem($item->getKey(), $item->get(), true))->expiresAt($expiresAt);
+
+        $this->deferred[$item->getKey()] = $item;
 
         return true;
     }
@@ -155,7 +190,7 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         $success = true;
 
-        foreach ($this->deferred as $item) {
+        foreach ($this->deferred as $key => $item) {
             $success = $success && $this->save($item);
         }
 
