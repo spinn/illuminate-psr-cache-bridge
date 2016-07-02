@@ -80,7 +80,9 @@ class CacheItem implements CacheItemInterface
     public function expiresAt($expires)
     {
         if ($expires instanceof DateTimeInterface && ! $expires instanceof DateTimeImmutable) {
-            $expires = DateTimeImmutable::createFromMutable($expires);
+            $timezone = $expires->getTimezone();
+            $expires = DateTimeImmutable::createFromFormat('U', $expires->getTimestamp(), $timezone);
+            $expires->setTimezone($timezone);
         }
 
         $this->expires = $expires;
