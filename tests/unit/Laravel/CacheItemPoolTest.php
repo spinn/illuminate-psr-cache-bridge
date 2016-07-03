@@ -376,4 +376,18 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
         // Assert
         $this->assertTrue($pool->hasItem($key));
     }
+
+    public function it_returns_false_when_repository_errors_on_put()
+    {
+        // Arrange
+        $repository = $this->getMockBuilder(Repository::class)->getMock();
+        $repository->method('put')->with('key', serialize('value'), 2)->willThrowException(new Exception());
+        $pool = new CacheItemPool($repository);
+
+        // Act
+        $result = $pool->save($pool->getItem('key')->set('value')->expiresAfter(120));
+
+        // Assert
+        $this->assertFalse($result);
+    }
 }
