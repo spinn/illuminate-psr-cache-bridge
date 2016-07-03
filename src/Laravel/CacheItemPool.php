@@ -57,7 +57,7 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function getItems(array $keys = array())
     {
-        return array_combine($keys, array_map(function ($key) {
+        return array_combine($keys, array_map(function($key) {
             return $this->getItem($key);
         }, $keys));
     }
@@ -73,7 +73,7 @@ class CacheItemPool implements CacheItemPoolInterface
             $item = $this->deferred[$key];
             $expiresAt = $this->getExpiresAt($item);
 
-            if (! $expiresAt) {
+            if (!$expiresAt) {
                 return true;
             }
 
@@ -109,7 +109,7 @@ class CacheItemPool implements CacheItemPoolInterface
 
         unset($this->deferred[$key]);
 
-        if (! $this->hasItem($key)) {
+        if (!$this->hasItem($key)) {
             return true;
         }
 
@@ -142,7 +142,7 @@ class CacheItemPool implements CacheItemPoolInterface
     {
         $expiresAt = $this->getExpiresAt($item);
 
-        if (! $expiresAt) {
+        if (!$expiresAt) {
             try {
                 $this->repository->forever($item->getKey(), serialize($item->get()));
             } catch (Exception $exception) {
