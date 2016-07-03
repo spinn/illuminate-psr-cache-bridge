@@ -360,4 +360,20 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
         // Assert
         $this->assertFalse($result);
     }
+
+    /** @test */
+    public function it_has_item_when_a_deferred_item_is_not_expired()
+    {
+        // Arrange
+        $repository = $this->getMockBuilder(Repository::class)->getMock();
+        $pool = new CacheItemPool($repository);
+        $key = 'bar';
+
+        // Act
+        $item = $pool->getItem($key);
+        $pool->saveDeferred($item->set('baz')->expiresAt(new \DateTimeImmutable('+ 1 seconds')));
+
+        // Assert
+        $this->assertTrue($pool->hasItem($key));
+    }
 }

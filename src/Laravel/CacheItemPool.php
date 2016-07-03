@@ -71,12 +71,13 @@ class CacheItemPool implements CacheItemPoolInterface
 
         if (isset($this->deferred[$key])) {
             $item = $this->deferred[$key];
+            $expiresAt = $this->getExpiresAt($item);
 
-            if (! $item->getExpiresAt()) {
+            if (! $expiresAt) {
                 return true;
             }
 
-            return $item->getExpiresAt() > new DateTimeImmutable();
+            return $expiresAt > new DateTimeImmutable();
         }
 
         return $this->repository->has($key);
@@ -88,9 +89,9 @@ class CacheItemPool implements CacheItemPoolInterface
     public function clear()
     {
         try {
-            /* @var \Illuminate\Contracts\Cache\Store $store */
             $this->deferred = [];
             $store = $this->repository;
+            /* @var \Illuminate\Contracts\Cache\Store $store */
             $store->flush();
         } catch (Exception $exception) {
             return false;
@@ -139,25 +140,31 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function save(CacheItemInterface $item)
     {
-        $expiresAt = $item->getExpiresAt();
+        $expiresAt = $this->getExpiresAt($item);
+
+        if (! $expiresAt) {
+            try {
+                $this->repository->forever($item->getKey(), serialize($item->get()));
+            } catch (Exception $exception) {
+                return false;
+            }
+
+            return true;
+        }
+
+        $now = new DateTimeImmutable('now', $expiresAt->getTimezone());
+
+        $seconds = $expiresAt->getTimestamp() - $now->getTimestamp();
+        $minutes = (int) floor($seconds / 60.0);
+
+        if ($minutes <= 0) {
+            $this->repository->forget($item->getKey());
+
+            return false;
+        }
 
         try {
-            if (! $expiresAt) {
-                $this->repository->forever($item->getKey(), serialize($item->get()));
-            } else {
-                $now = new DateTimeImmutable('now', $expiresAt->getTimezone());
-
-                $seconds = $expiresAt->getTimestamp() - $now->getTimestamp();
-                $minutes = (int) floor($seconds / 60.0);
-
-                if ($minutes <= 0) {
-                    $this->repository->forget($item->getKey());
-
-                    return false;
-                }
-
-                $this->repository->put($item->getKey(), serialize($item->get()), $minutes);
-            }
+            $this->repository->put($item->getKey(), serialize($item->get()), $minutes);
         } catch (Exception $exception) {
             return false;
         }
@@ -170,7 +177,7 @@ class CacheItemPool implements CacheItemPoolInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        $expiresAt = $item->getExpiresAt();
+        $expiresAt = $this->getExpiresAt($item);
 
         if ($expiresAt && ($expiresAt < new DateTimeImmutable())) {
             return false;
@@ -209,5 +216,15 @@ class CacheItemPool implements CacheItemPoolInterface
         if (!is_string($key) || preg_match('#[{}\(\)/\\\\@:]#', $key)) {
             throw new InvalidArgumentException();
         }
+    }
+
+    /**
+     * @param \Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItem $item
+     *
+     * @return \DateTimeInterface
+     */
+    private function getExpiresAt(CacheItem $item)
+    {
+        return $item->getExpiresAt();
     }
 }
