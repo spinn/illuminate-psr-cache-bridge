@@ -95,6 +95,12 @@ class CacheItem implements CacheItemInterface
      */
     public function expiresAfter($time)
     {
+        if ($time === null) {
+            $this->expires = null;
+
+            return;
+        }
+
         $this->expires = new DateTimeImmutable();
 
         if (! $time instanceof DateInterval) {
