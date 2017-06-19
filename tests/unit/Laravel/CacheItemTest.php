@@ -2,6 +2,7 @@
 namespace Madewithlove\IlluminatePsrCacheBridge\Tests\Unit\Laravel;
 
 use Carbon\Carbon;
+use DateTimeImmutable;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItem;
 use PHPUnit_Framework_TestCase;
 use Psr\Cache\CacheItemInterface;
@@ -45,8 +46,8 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         // Act
 
         // Assert
-        $this->assertEquals('key', $item->getKey());
-        $this->assertEquals($value, $item->get());
+        $this->assertSame('key', $item->getKey());
+        $this->assertSame($value, $item->get());
     }
 
     /** @test */
@@ -58,7 +59,10 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         // Act
 
         // Assert
-        $this->assertEquals(new \DateTimeImmutable('+ 1 minute'), $expiringInExactlyOneMinute->getExpiresAt());
+        $this->assertSame(
+            (new DateTimeImmutable('+ 1 minute'))->format('d-m-Y H:i:s'),
+            $expiringInExactlyOneMinute->getExpiresAt()->format('d-m-Y H:i:s')
+        );
     }
 
     /** @test */
@@ -70,7 +74,10 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         // Act
 
         // Assert
-        $this->assertEquals(new \DateTimeImmutable('+ 1 minute'), $expiringInExactlyOneMinute->getExpiresAt());
+        $this->assertSame(
+            (new DateTimeImmutable('+ 1 minute'))->format('d-m-Y H:i:s'),
+            $expiringInExactlyOneMinute->getExpiresAt()->format('d-m-Y H:i:s')
+        );
     }
 
     /** @test */
@@ -84,7 +91,7 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         $item->expiresAt($now->addMinute());
 
         // Assert
-        $this->assertTrue($now == $item->getExpiresAt());
+        $this->assertEquals($now, $item->getExpiresAt());
     }
 
     /** @test */
@@ -109,7 +116,7 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         $item->set('bar');
 
         // Assert
-        $this->assertEquals('bar', $item->get());
+        $this->assertSame('bar', $item->get());
     }
 
     /** @test */
