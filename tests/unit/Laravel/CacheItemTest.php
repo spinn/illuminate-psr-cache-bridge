@@ -91,7 +91,10 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         $item->expiresAt($now->addMinute());
 
         // Assert
-        $this->assertEquals($now, $item->getExpiresAt());
+        $this->assertSame(
+            $now->format('d-m-Y H:i:s'),
+            $item->getExpiresAt()->format('d-m-Y H:i:s')
+        );
     }
 
     /** @test */
