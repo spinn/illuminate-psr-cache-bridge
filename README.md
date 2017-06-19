@@ -20,6 +20,9 @@ $this->app->share(CacheItemPoolInterface::class, function () {
 
     return new CacheItemPool($repository);
 });
+
+// Depending on the version of Laravel you'll need to use this method instead:
+$this->app->singleton(...);
 ```
 
 Right now you're all set to start injecting `CacheItemPoolInterface`'d everywhere you need it.
