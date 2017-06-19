@@ -15,14 +15,11 @@ use Illuminate\Contracts\Cache\Repository;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
 use Psr\Cache\CacheItemPoolInterface;
 
-$this->app->share(CacheItemPoolInterface::class, function () {
-    $repository = $this->app->make(Repository::class);
+$this->app->singleton(CacheItemPoolInterface::class, function ($app) {
+    $repository = $app->make(Repository::class);
 
     return new CacheItemPool($repository);
 });
-
-// Depending on the version of Laravel you'll need to use this method instead:
-$this->app->singleton(...);
 ```
 
 Right now you're all set to start injecting `CacheItemPoolInterface`'d everywhere you need it.
