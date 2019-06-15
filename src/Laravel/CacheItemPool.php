@@ -152,19 +152,16 @@ class CacheItemPool implements CacheItemPoolInterface
             return true;
         }
 
-        $now = new DateTimeImmutable('now', $expiresAt->getTimezone());
+        $lifetime = LifetimeHelper::computeLifetime($expiresAt);
 
-        $seconds = $expiresAt->getTimestamp() - $now->getTimestamp();
-        $minutes = (int) floor($seconds / 60.0);
-
-        if ($minutes <= 0) {
+        if ($lifetime <= 0) {
             $this->repository->forget($item->getKey());
 
             return false;
         }
 
         try {
-            $this->repository->put($item->getKey(), serialize($item->get()), $minutes);
+            $this->repository->put($item->getKey(), serialize($item->get()), $lifetime);
         } catch (Exception $exception) {
             return false;
         }
