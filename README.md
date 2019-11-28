@@ -6,6 +6,8 @@
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/madewithlove/illuminate-psr-cache-bridge.svg?style=flat-square)](https://scrutinizer-ci.com/g/madewithlove/illuminate-psr-cache-bridge)
 [![Quality Score](https://img.shields.io/scrutinizer/g/madewithlove/illuminate-psr-cache-bridge.svg?style=flat-square)](https://scrutinizer-ci.com/g/madewithlove/illuminate-psr-cache-bridge)
 
+This package adds PSR-6 cache support to Laravel 5. Laravel 6 has PSR-6 support build in which can be used through the `cache.psr6` container alias.
+
 ## Usage
 
 To start using a `Psr\Cache\CacheItemPoolInterface` typed implementation that stores data in Laravel's configured cache, add this to a service provider:
