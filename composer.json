@@ -11,7 +11,7 @@
     "require-dev": {
         "cache/integration-tests": "^0.16.0",
         "illuminate/cache": "^5.0",
-        "phpunit/phpunit": "^4.8"
+        "phpunit/phpunit": "^7.0"
     },
     "provide": {
         "psr/cache-implementation": "1.0.0"
