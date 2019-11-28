@@ -4,10 +4,10 @@ namespace Madewithlove\IlluminatePsrCacheBridge\Tests\Unit\Laravel;
 use DateTime;
 use DateTimeImmutable;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItem;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 
-class CacheItemTest extends PHPUnit_Framework_TestCase
+class CacheItemTest extends TestCase
 {
     /** @test */
     public function it_can_be_constructed()
