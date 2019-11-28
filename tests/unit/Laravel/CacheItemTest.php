@@ -1,7 +1,7 @@
 <?php
 namespace Madewithlove\IlluminatePsrCacheBridge\Tests\Unit\Laravel;
 
-use Carbon\Carbon;
+use DateTime;
 use DateTimeImmutable;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItem;
 use PHPUnit_Framework_TestCase;
@@ -35,7 +35,7 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($itemHit->isHit());
         $this->assertFalse($itemMiss->isHit());
     }
-    
+
     /** @test */
     public function it_remembers_its_key_and_value()
     {
@@ -87,8 +87,10 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         $item = new CacheItem('key', 'value');
 
         // Act
-        Carbon::setTestNow($now = Carbon::now());
-        $item->expiresAt($now->addMinute());
+        $now = new DateTimeImmutable();
+        $inOneMinute = clone $now;
+        $inOneMinute->modify('+1 minute');
+        $item->expiresAt($inOneMinute);
 
         // Assert
         $this->assertSame(
@@ -129,9 +131,9 @@ class CacheItemTest extends PHPUnit_Framework_TestCase
         $item = new CacheItem('foo');
 
         // Act
-        Carbon::setTestNow($now = Carbon::now());
+        $now = new DateTime();
         $item->expiresAt($now);
-        $now->addMinute(1);
+        $now->modify('+1 minute');
 
         // Assert
         $this->assertNotEquals($now, $item->getExpiresAt());

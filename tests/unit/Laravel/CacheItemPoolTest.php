@@ -336,7 +336,7 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
         $seconds = 65;
         $minutes = 1;
         $repository = $this->getMockBuilder(Repository::class)->getMock();
-        $repository->method('put')->with('bar', serialize('baz'), $minutes)->willReturn(true);
+        $repository->method('put')->with('bar', serialize('baz'))->willReturn(true);
         $pool = new CacheItemPool($repository);
 
         // Act
