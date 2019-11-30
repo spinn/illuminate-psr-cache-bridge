@@ -3,9 +3,9 @@ namespace Madewithlove\IlluminatePsrCacheBridge\Tests\Unit\Exceptions;
 
 use Exception;
 use Madewithlove\IlluminatePsrCacheBridge\Exceptions\InvalidArgumentException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class InvalidArgumentExceptionTest extends PHPUnit_Framework_TestCase
+class InvalidArgumentExceptionTest extends TestCase
 {
     /** @test */
     public function it_can_be_constructed()

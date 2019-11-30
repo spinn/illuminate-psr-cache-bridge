@@ -10,6 +10,10 @@ use Psr\Cache\CacheItemPoolInterface;
 
 class IntegrationTest extends CachePoolTest
 {
+    protected $skippedTests = [
+        'testBasicUsageWithLongKey' => 'Memcached does not support key lenght over 250 characters.',
+    ];
+
     /**
      * @return CacheItemPoolInterface that is used in the tests
      */

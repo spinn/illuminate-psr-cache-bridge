@@ -5,11 +5,11 @@ use Exception;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Cache\Store;
 use Madewithlove\IlluminatePsrCacheBridge\Laravel\CacheItemPool;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 
-class CacheItemPoolTest extends PHPUnit_Framework_TestCase
+class CacheItemPoolTest extends TestCase
 {
     /** @test */
     public function it_can_be_constructed()
@@ -104,7 +104,7 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder(Repository::class)->getMock();
         $pool = new CacheItemPool($repository);
 
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         // Act
         $pool->hasItem('foo@bar');
@@ -179,7 +179,7 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder(Repository::class)->getMock();
         $pool = new CacheItemPool($repository);
 
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         // Act
         $pool->deleteItem('@');
@@ -194,7 +194,7 @@ class CacheItemPoolTest extends PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder(Repository::class)->getMock();
         $pool = new CacheItemPool($repository);
 
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         // Act
         $pool->deleteItems(['bar', 'foo', '{', '@']);
