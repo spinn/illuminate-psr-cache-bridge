@@ -1,5 +1,5 @@
 {
-    "name": "madewithlove/illuminate-psr-cache-bridge",
+    "name": "spinn/illuminate-psr-cache-bridge",
     "type": "library",
     "license": "MIT",
     "keywords": ["Laravel", "cache", "PSR-6", "adapter", "bridge", "implementation"],
